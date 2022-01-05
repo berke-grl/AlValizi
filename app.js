@@ -6,11 +6,11 @@ const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
 const FacebookStrategy = require('passport-facebook').Strategy;
 /********************************* */
-const GoogleStrategy=require("passport-google-oauth20").Strategy;
-const GOOGLE_CLIENT_ID="1053430864606-la1686pb7gjjk1dbg1mqbadjbctd6dfl.apps.googleusercontent.com";
-const GOOGLE_CLIENT_SECRET="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";
-const FACEBOOK_APP_ID="1025046654712958";
-const FACEBOOK_APP_SECRET="3cefac692d284afe41018e8e53a9623a";
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
+const GOOGLE_CLIENT_ID = "1053430864606-la1686pb7gjjk1dbg1mqbadjbctd6dfl.apps.googleusercontent.com";
+const GOOGLE_CLIENT_SECRET = "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";
+const FACEBOOK_APP_ID = "1025046654712958";
+const FACEBOOK_APP_SECRET = "3cefac692d284afe41018e8e53a9623a";
 
 
 const findOrCreate = require("mongoose-findorcreate");
@@ -101,29 +101,29 @@ const info4 = new Info({
     github: "mali"
 });
 
-const defaultInfos = [info1,info2,info3,info4];
+const defaultInfos = [info1, info2, info3, info4];
 
 
-app.get("/iletisim", function(req,res){
-    Info.find({}, function(err,foundInfos){
+app.get("/iletisim", function (req, res) {
+    Info.find({}, function (err, foundInfos) {
 
-        if(foundInfos.length === 0){
-            Info.insertMany(defaultInfos, function(err){
-                if(err){
+        if (foundInfos.length === 0) {
+            Info.insertMany(defaultInfos, function (err) {
+                if (err) {
                     console.log(err);
-                }else{
+                } else {
                     console.log("saved");
                 }
             });
             res.redirect("/iletisim");
-        }else{
-            res.render("iletisim",{ title: "İletişim Bilgileri", infos: foundInfos });    
+        } else {
+            res.render("iletisim", { title: "İletişim Bilgileri", infos: foundInfos });
         }
 
 
-        
+
     })
-    
+
 });
 
 const aboutUsSchema = new mongoose.Schema({
@@ -136,36 +136,36 @@ const AboutUs = mongoose.model("AboutUs", aboutUsSchema);
 const aboutUs = new AboutUs({
     title: "Hakkımızda",
     content: "Web teknolojileri ve programlama dersinde proje ortaya koymak amacıyla bir araya gelmiş bir ekibiz. Alvalizi adında "
-    + "insanların seyahat ettikleri yerleri birbirleriyle paylaşabilmeleri için hazırladığımız web projesini sizlere sunuyoruz. "
+        + "insanların seyahat ettikleri yerleri birbirleriyle paylaşabilmeleri için hazırladığımız web projesini sizlere sunuyoruz. "
 });
 
 const defaultAboutUs = [aboutUs];
 
-app.get("/aboutUs", function(req,res){
-    AboutUs.find({}, function(err,foundInfos){
+app.get("/aboutUs", function (req, res) {
+    AboutUs.find({}, function (err, foundInfos) {
 
-        if(foundInfos.length === 0){
-            AboutUs.insertMany(defaultAboutUs, function(err){
-                if(err){
+        if (foundInfos.length === 0) {
+            AboutUs.insertMany(defaultAboutUs, function (err) {
+                if (err) {
                     console.log(err);
-                }else{
+                } else {
                     console.log("saved");
                 }
             });
             res.redirect("/aboutUs");
-        }else{
-            res.render("aboutUs",{infos: foundInfos });    
+        } else {
+            res.render("aboutUs", { infos: foundInfos });
         }
 
 
-        
+
     })
-    
+
 });
 
-app.get("/destek", function(req,res){
+app.get("/destek", function (req, res) {
     res.render("destek");
-    
+
 });
 
 const userSchema = new mongoose.Schema({
@@ -188,14 +188,14 @@ const User = new mongoose.model("User", userSchema);
 
 passport.use(User.createStrategy());
 
-passport.serializeUser(function(user, done) {
-  done(null, user.id);
+passport.serializeUser(function (user, done) {
+    done(null, user.id);
 });
 
-passport.deserializeUser(function(id, done) {
-  User.findById(id, function(err, user) {
-    done(err, user);
-  });
+passport.deserializeUser(function (id, done) {
+    User.findById(id, function (err, user) {
+        done(err, user);
+    });
 });
 /***************FACEBOOK*********************** */
 passport.use(new FacebookStrategy({
@@ -203,24 +203,24 @@ passport.use(new FacebookStrategy({
     clientSecret: FACEBOOK_APP_SECRET,
     callbackURL: "/auth/facebook/callback",
     profileFields: ['id', 'email', 'gender', 'link', 'locale', 'name', 'timezone', 'updated_time', 'verified'],
-  },
-  function(accessToken, refreshToken, profile, cb) {
+},
+    function (accessToken, refreshToken, profile, cb) {
 
-   User.findOrCreate({ facebookId: profile.id ,username:profile._json.email}, function (err, user) {
-      return cb(err, user);
-    });
-  }
+        User.findOrCreate({ facebookId: profile.id, username: profile._json.email }, function (err, user) {
+            return cb(err, user);
+        });
+    }
 ));
 
 app.get('/auth/facebook',
-  passport.authenticate('facebook', {scope: ['email']}));
+    passport.authenticate('facebook', { scope: ['email'] }));
 
 app.get('/auth/facebook/callback',
-  passport.authenticate('facebook', { failureRedirect: '/login' }),
-  function(req, res) {
-    // Successful authentication, redirect home.
-    res.redirect('/posts');
-  });
+    passport.authenticate('facebook', { failureRedirect: '/login' }),
+    function (req, res) {
+        // Successful authentication, redirect home.
+        res.redirect('/posts');
+    });
 
 /***************GOOGLE******************** */
 passport.use(new GoogleStrategy({
@@ -228,26 +228,26 @@ passport.use(new GoogleStrategy({
     clientSecret: GOOGLE_CLIENT_SECRET,
     callbackURL: "/auth/google/callback",
     userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo"
-  },
-  function(accessToken, refreshToken, profile, cb) {
-    //console.log(profile);
+},
+    function (accessToken, refreshToken, profile, cb) {
+        //console.log(profile);
 
-    User.findOrCreate({ googleId: profile.id,username:profile._json.email}, function (err, user) {
-      return cb(err, user);
-    });
-  }
+        User.findOrCreate({ googleId: profile.id, username: profile._json.email }, function (err, user) {
+            return cb(err, user);
+        });
+    }
 ));
 
 
 app.get('/auth/google',
-  passport.authenticate('google', { scope: ['profile','email'] }));
+    passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-app.get('/auth/google/callback', 
-  passport.authenticate('google', { failureRedirect: '/login' }),
-  function(req, res) {
-    // Successful authentication, redirect home.
-    res.redirect('/posts');
-  });
+app.get('/auth/google/callback',
+    passport.authenticate('google', { failureRedirect: '/login' }),
+    function (req, res) {
+        // Successful authentication, redirect home.
+        res.redirect('/posts');
+    });
 /********************************************** */
 
 
@@ -280,7 +280,7 @@ app.get("/posts", function (req, res) {
             }
         });
     } else {
-        
+
         res.redirect("/login");
     }
 });
@@ -532,19 +532,25 @@ app.post("/updatePost", function (req, res) {
     })
 })
 
-app.get("/deleteAcc", function(req,res){
+app.get("/deleteAcc", function (req, res) {
     res.render("deleteAcc");
 });
-app.post("/deleteAcc", function(req,res){
-    User.findOneAndRemove({username: req.user.username}, function(err){
-        if(!err){
+app.post("/deleteAcc", function (req, res) {
+    User.findOneAndRemove({ username: req.user.username }, function (err) {
+        if (!err) {
             console.log("Deleted Successfully");
             res.redirect("/");
         }
     })
 });
 
-app.listen(3000, function () {
-    console.log("Server running on port 3000");
+
+let port = process.env.PORT;
+if (port == null || port == "") {
+    port = 3000;
+}
+
+app.listen(port, function () {
+    console.log("Server has started Successfully");
 });
 
