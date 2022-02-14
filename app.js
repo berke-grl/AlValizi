@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
@@ -7,10 +8,10 @@ const passportLocalMongoose = require("passport-local-mongoose");
 const FacebookStrategy = require('passport-facebook').Strategy;
 /********************************* */
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
-const GOOGLE_CLIENT_ID = "1053430864606-la1686pb7gjjk1dbg1mqbadjbctd6dfl.apps.googleusercontent.com";
-const GOOGLE_CLIENT_SECRET = "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";
-const FACEBOOK_APP_ID = "1025046654712958";
-const FACEBOOK_APP_SECRET = "3cefac692d284afe41018e8e53a9623a";
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+const FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID;
+const FACEBOOK_APP_SECRET = process.env.FACEBOOK_APP_SECRET;
 
 
 const findOrCreate = require("mongoose-findorcreate");
@@ -43,17 +44,12 @@ const profileSchema = new mongoose.Schema({
 });
 const Profile = mongoose.model("Profile", profileSchema);
 
-
 const commentSchema = new mongoose.Schema({
     author: String,
     comment: String,
     rating: Number,
 });
 const Comment = mongoose.model("Comment", commentSchema);
-
-
-
-
 
 const postSchema = new mongoose.Schema({
     title: { required: true, type: String },
@@ -259,6 +255,15 @@ app.get("/login", function (req, res) {
     res.render("login");
 });
 
+app.post("/login", passport.authenticate("local", { failureRedirect: "/login" }), function (req, res) {
+    res.redirect("/posts");
+});
+
+app.get("/logout", function (req, res) {
+    req.logOut();
+    res.redirect("/")
+});
+
 app.get("/register", function (req, res) {
     res.render("register");
 });
@@ -285,11 +290,6 @@ app.get("/posts", function (req, res) {
     }
 });
 
-app.get("/logout", function (req, res) {
-    req.logOut();
-    res.redirect("/")
-});
-
 app.get("/covid", function (req, res) {
     if (req.isAuthenticated()) {
         res.render("covid");
@@ -305,7 +305,6 @@ app.get("/postShare", function (req, res) {
         res.redirect("/login");
     }
 });
-
 
 app.get("/profileCompleted", function (req, res) {
     if (req.isAuthenticated()) {
@@ -353,6 +352,21 @@ app.get("/passwordChange", function (req, res) {
     }
 });
 
+app.post("/passwordChange", function (req, res) {
+    User.findOne({ username: req.body.username }, function (err, doc) {
+        if (doc) {
+            doc.changePassword(req.body.oldPassword, req.body.newpassword, function (err) {
+                if (err) {
+                    console.log(err);
+                    res.redirect("/passwordChange");
+                } else {
+                    res.redirect("/posts");
+                }
+            })
+        }
+    })
+});
+
 app.get("/myShares", function (req, res) {
     User.findOne({ username: req.user.username }, function (err, doc) {
         if (!err) {
@@ -375,10 +389,6 @@ app.get("/update", function (req, res) {
     });
 });
 
-app.post("/login", passport.authenticate("local", { failureRedirect: "/login" }), function (req, res) {
-    res.redirect("/posts");
-});
-
 app.post("/register", function (req, res) {
     User.register({ username: req.body.username }, req.body.password, function (err, user) {
         if (err) {
@@ -387,21 +397,6 @@ app.post("/register", function (req, res) {
         } else {
             passport.authenticate("local")(req, res, function () {
                 res.redirect("/posts")
-            })
-        }
-    })
-});
-
-app.post("/passwordChange", function (req, res) {
-    User.findOne({ username: req.body.username }, function (err, doc) {
-        if (doc) {
-            doc.changePassword(req.body.oldPassword, req.body.newpassword, function (err) {
-                if (err) {
-                    console.log(err);
-                    res.redirect("/passwordChange");
-                } else {
-                    res.redirect("/posts");
-                }
             })
         }
     })
@@ -440,7 +435,6 @@ app.post("/postShare", function (req, res) {
     const post = new Post({
         title: req.body.postTitle,
         content: req.body.postBody,
-        upimage: req.body.img
     });
     post.save();
     User.findOneAndUpdate({ username: req.user.username }, { $push: { myPosts: post } }, function (err) {
@@ -535,6 +529,7 @@ app.post("/updatePost", function (req, res) {
 app.get("/deleteAcc", function (req, res) {
     res.render("deleteAcc");
 });
+
 app.post("/deleteAcc", function (req, res) {
     User.findOneAndRemove({ username: req.user.username }, function (err) {
         if (!err) {
