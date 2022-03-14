@@ -22,4 +22,4 @@ proje url: https://shielded-everglades-33789.herokuapp.com
 
 ## Translate Ekranı
 ![Photo](https://user-images.githubusercontent.com/58556840/158236224-1c8133ef-74f2-446b-a841-2a6a1d661fe0.png)busercontent.com/58556840/158236121-95882fce-2d9e-4ebe-81f5-686d62505178.png)
-![Photo](https://user-ima…
+
