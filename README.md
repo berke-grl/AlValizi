@@ -15,4 +15,11 @@ proje url: https://shielded-everglades-33789.herokuapp.com
 
 ## Üye Giriş Ekranı ve Gece Modu
 ![Photo](https://user-images.githubusercontent.com/58556840/158236121-95882fce-2d9e-4ebe-81f5-686d62505178.png)
+![Photo](https://user-images.githubusercontent.com/58556840/158236266-8a931cec-6a0a-4151-8738-5f6623ad320a.png)
+
+## Covid Vaka Tablosu
+![Photo](https://user-images.githubusercontent.com/58556840/158236164-634b8da4-1bf6-48ff-9450-a55f841ced84.png)
+
+## Translate Ekranı
+![Photo](https://user-images.githubusercontent.com/58556840/158236224-1c8133ef-74f2-446b-a841-2a6a1d661fe0.png)busercontent.com/58556840/158236121-95882fce-2d9e-4ebe-81f5-686d62505178.png)
 ![Photo](https://user-ima…
